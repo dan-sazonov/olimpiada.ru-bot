@@ -3,7 +3,7 @@
 https://github.com/dan-sazonov/olimpiada.ru-bot/blob/main/LICENSE)
 ![OpenSource](https://img.shields.io/badge/Open%20Source-%E2%99%A5-red)<br>
 
-**Telegram bot for getting news about the olympiads from the website olimpiada.ru**
+**The unofficial telegram bot for getting news about the olympiads from the website olimpiada.ru**
 
 ## 🤝 Contributing
 If you have any ideas or found any bugs here, plz open the [issue](https://github.com/dan-sazonov/olimpiada.ru-bot/issues)
