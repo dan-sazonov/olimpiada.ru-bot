@@ -26,3 +26,19 @@ def get_last_news(url):
     title = out[1].strip('\t')
 
     return date, title
+
+
+def get_calender(url):
+    i = 0
+    calender = dict()
+
+    out = get_html(url, '.left > .events_for_activity')
+    if not out:
+        return None
+    out = out[0].select('td > a')
+
+    while i < len(out):
+        calender[out[i].text.replace('\xa0', ' ')] = out[i + 1].text.replace('\xa0', ' ')
+        i += 2
+
+    return calender
