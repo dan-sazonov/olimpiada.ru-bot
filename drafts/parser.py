@@ -8,6 +8,6 @@ url = url.rstrip('/')
 response = requests.get(f'{url}/{activity_id}')
 soup = BeautifulSoup(response.text, 'lxml')
 
-out = soup.select('.headline_activity h1')
+out = soup.select('#new_for_activity a.new_link:first-child')
 
 print(out[0].text)
