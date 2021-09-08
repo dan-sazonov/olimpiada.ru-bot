@@ -17,7 +17,7 @@ def get_last_news(url):
 
     out = soup.select('#new_for_activity a.new_link:first-child')
     if not out:
-        return None
+        return None, None
 
     out = out[0].text.split('\n')
     date = out[0].strip('\t').split(', ')[-1]
