@@ -142,4 +142,3 @@ cython_debug/
 
 # other
 .idea/
-test.py
