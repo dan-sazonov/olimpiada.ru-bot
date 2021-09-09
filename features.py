@@ -16,14 +16,14 @@ def get_html(url, selector):
 def get_title(url):
     out = get_html(url, '.headline_activity h1')
 
-    return out[0].text if out else None
+    return out[0].text if out else ''
 
 
 def get_last_news(url):
     out = get_html(url, '#new_for_activity a.new_link:first-child')
 
     if not out:
-        return None, None
+        return '', ''
 
     out = out[0].text.split('\n')
     date = out[0].strip('\t').split(', ')[-1]
@@ -38,7 +38,7 @@ def get_calender(url):
 
     out = get_html(url, '.left > .events_for_activity')
     if not out:
-        return None
+        return dict()
     out = out[0].select('td > a')
 
     while i < len(out):
