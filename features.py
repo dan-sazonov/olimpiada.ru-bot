@@ -3,7 +3,11 @@ from bs4 import BeautifulSoup
 
 
 def get_html(url, selector):
-    response = requests.get(url.rstrip('/'))
+    try:
+        response = requests.get(url.rstrip('/'))
+    except requests.exceptions.ConnectionError or requests.exceptions.MissingSchema:
+        # do something if url is wrong
+        return ''
     soup = BeautifulSoup(response.text, 'lxml')
 
     return soup.select(selector)
