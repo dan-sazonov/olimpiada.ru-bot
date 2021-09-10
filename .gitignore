@@ -142,3 +142,4 @@ cython_debug/
 
 # other
 .idea/
+/drafts/test.db
