@@ -14,7 +14,7 @@ def get_html(url: str, selector: str) -> element.ResultSet:
         response = requests.get(url.rstrip('/'))
     except requests.exceptions.ConnectionError or requests.exceptions.MissingSchema:
         # do something if url is wrong
-        return BeautifulSoup.ResultSet()
+        return element.ResultSet('')
     soup = BeautifulSoup(response.text, 'lxml')
 
     return soup.select(selector)
