@@ -140,6 +140,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# other
-.idea/
+# drafts
 /drafts/test.db
+/drafts/parser.py
+
+# IDE and system files
+.idea/
