@@ -71,3 +71,27 @@ def get_calender(url: str) -> dict:
         i += 2
 
     return calender
+
+
+def get_url(url: str) -> str:
+    """
+    Return the url of the latest news about this competition
+
+    :param url: url of the competition
+    :return: url of this news
+    """
+    # сайт, который мы парсим, решил прилечь. За 3 fucking дня до дэдлайна.
+    # допилю эту фичу, как olimpiada.ru поднимется
+    pass
+
+
+def get_status(url: str) -> str:
+    """
+    Return the current status of this competition
+
+    :param url: url of the competition
+    :return: current status
+    """
+    # сайт, который мы парсим, решил прилечь. За 3 fucking дня до дэдлайна.
+    # допилю эту фичу, как olimpiada.ru поднимется
+    pass
