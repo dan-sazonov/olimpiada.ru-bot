@@ -142,7 +142,7 @@ cython_debug/
 
 # drafts
 /drafts/test.db
-/drafts/parser.py
+/drafts/test-parser.py
 
 # IDE and system files
 .idea/
