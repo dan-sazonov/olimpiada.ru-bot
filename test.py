@@ -8,7 +8,7 @@ for i in testing:
     url = f'https://olimpiada.ru/activity/{i}'
     title = scrapper.get_title(url)
     date, news_title = scrapper.get_last_news(url)
-    calender = scrapper.get_calender(url)
+    calender = scrapper.get_calendar(url)
 
     print(url)
     print(title)

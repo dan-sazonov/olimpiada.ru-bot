@@ -1,4 +1,5 @@
 import requests
+# import features
 from bs4 import BeautifulSoup, element
 
 
@@ -51,7 +52,7 @@ def get_last_news(url: str) -> tuple:
     return date, title
 
 
-def get_calender(url: str) -> dict:
+def get_calendar(url: str):
     """
     Returns calendar with the schedule of this competition
 
@@ -59,18 +60,18 @@ def get_calender(url: str) -> dict:
     :return: dict: {'name of this round': 'date of the event'}
     """
     i = 0
-    calender = dict()
+    calendar = list()
 
     out = get_html(url, '.left > .events_for_activity')
     if not out:
-        return dict()
+        return list()
     out = out[0].select('td > a')
 
     while i < len(out):
-        calender[out[i].text.replace('\xa0', ' ')] = out[i + 1].text.replace('\xa0', ' ')
+        calendar.append(([out[i].text.replace('\xa0', ' ')], out[i + 1].text.replace('\xa0', ' ')))
         i += 2
 
-    return calender
+    return calendar
 
 
 def get_url(url: str) -> str:
