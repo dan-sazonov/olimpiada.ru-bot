@@ -42,7 +42,15 @@ def convert_date(usr_date: str) -> (datetime.date, bool):
     return date(year, month, day), was_this_date
 
 
-def last_event_info():
-    # вернет название и дату предстоящего мероприятия по календарю. событие считается предстоящим, если оно превое в
-    # календаре или событие, стоящее перед ним уже нваступило, и до его начала меньше 30 дней
-    pass
+def last_event_info(calendar: list) -> (str, datetime.date):
+    """
+    Returns the name and date of the next event from the calendar
+
+    :param calendar: list with the pairs title-date in the tuple. Received from the database or get_calendar
+    :return: (title, date). If there are no upcoming events, returns a tuple with two empty strings
+    """
+    for event in calendar:
+        time, already_been = convert_date(event[1].split('...')[0])
+        if not already_been:
+            return event[0], time
+    return '', ''
