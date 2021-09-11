@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, date
 from scrapper import get_title
 
 
@@ -18,13 +18,23 @@ def validate_url(url: str) -> (str, int):
     return url, int(event_id)
 
 
-def convert_date(date: str) -> datetime.date:
+def convert_date(usr_date: str) -> datetime.date:
     """
-    Returns some fucking piece of shit
+    Converts a user-friendly date to a datetime object. If this day was already in this year, the value of the year will
+     be equal to the current one, otherwise the previous one. If got the empty string, ValueError will be raised
 
-    :param date:
-    :return:
+    :param usr_date: user-friendly date in the form of 'day month'
+    :return: datetime.date object with this date
     """
-    # сайт, который мы парсим, решил прилечь. За 3 fucking дня до дэдлайна.
-    # todo допилю эту фичу, как olimpiada.ru поднимется
-    pass
+    month_names = {'янв': 1, 'фев': 2, 'мар': 3, 'апр': 4, 'мая': 5, 'июн': 6, 'июл': 7, 'авг': 8, 'сен': 9, 'окт': 10,
+                   'ноя': 11, 'дек': 12}
+    day, month = usr_date.split()
+    day = int(day)
+    month = month_names[month.lower()[:3]]
+    year = datetime.date(datetime.now()).year
+
+    cur_month = datetime.date(datetime.now()).month
+    cur_day = datetime.date(datetime.now()).day
+    year -= 1 if (month > cur_month) or (month == cur_month and day > cur_day) else 0
+
+    return date(year, month, day)

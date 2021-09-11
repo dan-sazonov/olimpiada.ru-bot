@@ -12,7 +12,8 @@ for i in testing:
 
     print(url)
     print(title)
-    print(date)
+    print(date, end=' ')
+    print('' if not date else features.convert_date(date))
     print(news_title)
     print(calender)
 
