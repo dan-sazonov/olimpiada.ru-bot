@@ -18,13 +18,14 @@ def validate_url(url: str) -> (str, int):
     return url, int(event_id)
 
 
-def convert_date(usr_date: str) -> datetime.date:
+def convert_date(usr_date: str) -> (datetime.date, bool):
     """
     Converts a user-friendly date to a datetime object. If this day was already in this year, the value of the year will
-     be equal to the current one, otherwise the previous one. If got the empty string, ValueError will be raised
+    be equal to the current one, otherwise the previous one. The second parameter returns True if this date was in this
+    year. If got the empty string, ValueError will be raised
 
     :param usr_date: user-friendly date in the form of 'day month'
-    :return: datetime.date object with this date
+    :return: (datetime.date object with this date, bool flag)
     """
     month_names = {'янв': 1, 'фев': 2, 'мар': 3, 'апр': 4, 'мая': 5, 'июн': 6, 'июл': 7, 'авг': 8, 'сен': 9, 'окт': 10,
                    'ноя': 11, 'дек': 12}
@@ -35,6 +36,13 @@ def convert_date(usr_date: str) -> datetime.date:
 
     cur_month = datetime.date(datetime.now()).month
     cur_day = datetime.date(datetime.now()).day
-    year -= 1 if (month > cur_month) or (month == cur_month and day > cur_day) else 0
+    was_this_date = (month < cur_month) or (month == cur_month and day <= cur_day)
+    year -= not was_this_date
 
-    return date(year, month, day)
+    return date(year, month, day), was_this_date
+
+
+def last_event_info():
+    # вернет название и дату предстоящего мероприятия по календарю. событие считается предстоящим, если оно превое в
+    # календаре или событие, стоящее перед ним уже нваступило, и до его начала меньше 30 дней
+    pass
