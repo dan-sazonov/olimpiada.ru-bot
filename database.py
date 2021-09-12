@@ -11,8 +11,7 @@ def init_bd() -> (sqlite3.Connection, sqlite3.Cursor):
     db = sqlite3.connect('main.db')
     cursor = db.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, title TEXT, news_date TIMESTAMP, "
-                   "news_title TEXT, news_link TEXT, calender TEXT, next_event TEXT, next_date TIMESTAMP, "
-                   "event_status TEXT)")
+                   "news_title TEXT, calendar TEXT, next_round TEXT, next_date TIMESTAMP, event_status TEXT)")
     cursor.execute("CREATE TABLE IF NOT EXISTS users(user INTEGER PRIMARY KEY, ids TEXT)")
     db.commit()
 
@@ -39,3 +38,7 @@ def add_events(user_id: int, events: set) -> None:
         cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
 
     db.commit()
+
+
+if __name__ == "__main__":
+    init_bd()
