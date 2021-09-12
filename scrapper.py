@@ -1,5 +1,5 @@
 import requests
-# import features
+import features
 from bs4 import BeautifulSoup, element
 
 
@@ -86,3 +86,17 @@ def get_status(url: str) -> str:
     out = get_html(url, '.headline_activity a.red')
 
     return out[0].text.rstrip(' →') if out else ''
+
+
+class ParsedEvent(object):
+    def __init__(self, url: str):
+        """
+        Parse th event and set the class attributes
+
+        :param url: url or id of this event
+        """
+        self.url, self.id = features.validate_url(url)
+        self.title = get_title(self.url)
+        self.last_news_date, self.last_news_title = get_last_news(self.url)
+        self.calendar = get_calendar(self.url)
+        self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
