@@ -35,7 +35,8 @@ def get_title(url: str) -> str:
 
 def get_last_news(url: str) -> tuple:
     """
-    Returns the title of the latest news about this competition
+    Returns the title of the latest news about this competition. If the news title contains link to the article, this
+    link will be added to the title
 
     :param url: url of the competition
     :return: date of publishing and title of this news: (date, title)
@@ -45,9 +46,10 @@ def get_last_news(url: str) -> tuple:
     if not out:
         return '', ''
 
+    link = out[0].attrs["href"]
     out = out[0].text.split('\n')
     date = out[0].strip('\t').split(', ')[-1]
-    title = out[1].strip('\t')
+    title = out[1].strip('\t') if link.startswith('/news') else out[1].strip('\t') + f': https://olimpiada.ru{link}'
 
     return date, title
 
@@ -72,18 +74,6 @@ def get_calendar(url: str):
         i += 2
 
     return calendar
-
-
-def get_url(url: str) -> str:
-    """
-    Return the url of the latest news about this competition
-
-    :param url: url of the competition
-    :return: url of this news
-    """
-    # сайт, который мы парсим, решил прилечь. За 3 fucking дня до дэдлайна.
-    # todo допилю эту фичу, как olimpiada.ru поднимется
-    pass
 
 
 def get_status(url: str) -> str:
