@@ -1,5 +1,22 @@
 from datetime import datetime, date
-from scrapper import get_title
+from bs4 import BeautifulSoup
+import requests
+
+
+def test_parsing(url: str) -> bool:
+    """
+    Returns true if the page from the url parameter has a valid header
+
+    :param url: url of this page
+    :return: bool flag
+    """
+    try:
+        response = requests.get(url.rstrip('/'))
+    except:
+        return False
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    return bool(soup.select('.headline_activity h1'))
 
 
 def validate_url(url: str) -> (str, int):
@@ -12,7 +29,7 @@ def validate_url(url: str) -> (str, int):
     if url.isdigit():
         event_id = url
         url = f'https://olimpiada.ru/activity/{event_id}'
-    if not (url.startswith('https://olimpiada.ru/activity/') and get_title(url)):
+    if not (url.startswith('https://olimpiada.ru/activity/') and test_parsing(url)):
         return '', 0
     event_id = url.strip('/').split('/')[-1]
     return url, int(event_id)
