@@ -69,5 +69,5 @@ def last_event_info(calendar: list) -> (str, datetime.date):
     for event in calendar:
         time, already_been = convert_date(f"{event[1].split('...')[0]} {event[1].split()[-1]}")
         if not already_been:
-            return event[0], time
+            return ' '.join(event[0]), time
     return '', ''
