@@ -7,13 +7,13 @@ cursor = db.cursor()
 
 # создаем бд с указанными столбцами
 cursor.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, title TEXT, news_date TIMESTAMP, "
-               "news_title TEXT, news_link TEXT, calender TEXT, next_event TEXT, next_date TIMESTAMP)")
+               "news_title TEXT, news_link TEXT, calender TEXT, next_event TEXT, next_date TIMESTAMP, event_status)")
 db.commit()
 
 # записываем инфу по новой олимпиаде
 data = (1, 'Четкая олимпиада', datetime.date(2021, 8, 29), 'заголовок новости', 'https://yandex.ru',
-        str([(['Начало'], '10 сен')]), 'Начало', datetime.date(2021, 9, 10))
-cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, news_link, calender, next_event, next_date) "
+        str([(['Начало'], '10 сен')]), 'Начало', datetime.date(2021, 9, 10), 'скоро')
+cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, news_link, calender, next_event, next_date, event_status) "
                "VALUES(?, ?, ?, ?, ?, ?, ?, ?)", data)
 db.commit()
 

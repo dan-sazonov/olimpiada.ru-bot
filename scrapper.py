@@ -83,6 +83,6 @@ def get_status(url: str) -> str:
     :param url: url of the competition
     :return: current status
     """
-    # сайт, который мы парсим, решил прилечь. За 3 fucking дня до дэдлайна.
-    # todo допилю эту фичу, как olimpiada.ru поднимется
-    pass
+    out = get_html(url, '.headline_activity a.red')
+
+    return out[0].text.rstrip(' →') if out else ''
