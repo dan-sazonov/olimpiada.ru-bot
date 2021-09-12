@@ -29,7 +29,7 @@ def convert_date(usr_date: str) -> (datetime.date, bool):
     """
     month_names = {'янв': 1, 'фев': 2, 'мар': 3, 'апр': 4, 'мая': 5, 'июн': 6, 'июл': 7, 'авг': 8, 'сен': 9, 'окт': 10,
                    'ноя': 11, 'дек': 12}
-    day, month = usr_date.split()
+    day, month = usr_date.split()[:2]
     day = int(day)
     month = month_names[month.lower()[:3]]
     year = datetime.date(datetime.now()).year
@@ -50,7 +50,7 @@ def last_event_info(calendar: list) -> (str, datetime.date):
     :return: (title, date). If there are no upcoming events, returns a tuple with two empty strings
     """
     for event in calendar:
-        time, already_been = convert_date(event[1].split('...')[0])
+        time, already_been = convert_date(f"{event[1].split('...')[0]} {event[1].split()[-1]}")
         if not already_been:
             return event[0], time
     return '', ''

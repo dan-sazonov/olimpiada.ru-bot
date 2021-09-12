@@ -2,7 +2,7 @@ import features
 import scrapper
 import requests
 
-testing = list(range(1, 6)) + [73, 153, 465, 22]
+testing = list(range(1, 6)) + [73, 153, 465, 22, 5283]
 
 for i in testing:
     url = f'https://olimpiada.ru/activity/{i}'
