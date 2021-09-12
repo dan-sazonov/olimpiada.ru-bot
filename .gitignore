@@ -145,5 +145,8 @@ cython_debug/
 /drafts/test-parser.py
 /drafts/bot
 
+# database
+main.db
+
 # IDE and system files
 .idea/
