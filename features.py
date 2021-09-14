@@ -35,13 +35,15 @@ def validate_url(url: str) -> (str, int):
     return url, int(event_id)
 
 
-def convert_date(usr_date: str) -> (datetime.date, bool):
+def convert_date(usr_date: str, is_upcoming=False) -> (datetime.date, bool):
     """
     Converts a user-friendly date to a datetime object. If this day was already in this year, the value of the year will
-    be equal to the current one, otherwise the previous one. The second parameter returns True if this date was in this
-    year. If got the empty string, ValueError will be raised
+    be equal to the current one, otherwise the previous one. If the is_upcoming flag is set to True and this day was
+    already in this year before September 1, then the year will be increased by 1. The second parameter returns True if
+    this date was in this year. If got the empty string, ValueError will be raised
 
     :param usr_date: user-friendly date in the form of 'day month'
+    :param is_upcoming: flag, read the docstring
     :return: (datetime.date object with this date, bool flag)
     """
     month_names = {'янв': 1, 'фев': 2, 'мар': 3, 'апр': 4, 'мая': 5, 'июн': 6, 'июл': 7, 'авг': 8, 'сен': 9, 'окт': 10,
@@ -50,11 +52,12 @@ def convert_date(usr_date: str) -> (datetime.date, bool):
     day = int(day)
     month = month_names[month.lower()[:3]]
     year = datetime.date(datetime.now()).year
-
     cur_month = datetime.date(datetime.now()).month
     cur_day = datetime.date(datetime.now()).day
+
     was_this_date = (month < cur_month) or (month == cur_month and day <= cur_day)
-    year -= not was_this_date
+    year -= int(not was_this_date and not is_upcoming)
+    year += int((was_this_date and month < 9) and is_upcoming)
 
     return date(year, month, day), was_this_date
 
@@ -67,7 +70,7 @@ def last_event_info(calendar: list) -> (str, datetime.date):
     :return: (title, date). If there are no upcoming events, returns a tuple with two empty strings
     """
     for event in calendar:
-        time, already_been = convert_date(f"{event[1].split('...')[0]} {event[1].split()[-1]}")
+        time, already_been = convert_date(f"{event[1].split('...')[0]} {event[1].split()[-1]}", is_upcoming=True)
         if not already_been:
             return ' '.join(event[0]), time
     return '', ''
