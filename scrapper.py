@@ -91,7 +91,7 @@ def get_status(url: str) -> str:
 class ParsedEvent(object):
     def __init__(self, url: str):
         """
-        Parse th event and set the class attributes
+        Parse the event and set the class attributes
 
         :param url: url or id of this event
         """
@@ -100,3 +100,4 @@ class ParsedEvent(object):
         self.last_news_date, self.last_news_title = get_last_news(self.url)
         self.calendar = get_calendar(self.url)
         self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
+        self.status = get_status(self.url)
