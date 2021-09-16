@@ -66,7 +66,7 @@ def convert_date(usr_date: str, is_upcoming=False) -> (datetime.date, bool):
     return date(year, month, day), was_this_date
 
 
-def last_event_info(calendar: list) -> (str, datetime.date):
+def last_event_info(calendar: list) -> tuple[str, datetime.date]:
     """
     Returns the name and date of the next event from the calendar
 

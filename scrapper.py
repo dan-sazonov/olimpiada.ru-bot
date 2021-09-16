@@ -38,7 +38,7 @@ def get_title(url: str) -> str:
     return out[0].text if out else ''
 
 
-def get_last_news(url: str) -> tuple:
+def get_last_news(url: str) -> tuple[str, str]:
     """
     Returns the title of the latest news about this competition. If the news title contains link to the article, this
     link will be added to the title
@@ -59,7 +59,7 @@ def get_last_news(url: str) -> tuple:
     return date, title
 
 
-def get_calendar(url: str):
+def get_calendar(url: str) -> list[tuple[list, str]]:
     """
     Returns calendar with the schedule of this competition
 
