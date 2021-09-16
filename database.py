@@ -41,6 +41,28 @@ def add_events(user_id: int, events: set) -> None:
     db.commit()
 
 
+def remove_events(user_id: int, events: set) -> None:
+    """
+    Remove events from the database for the selected user
+
+    :param user_id: user's telegram id
+    :param events: set of olympiad ids, int
+    :return: None
+    """
+
+    db, cursor = init_bd()
+    cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+
+    if not cursor.fetchone():
+        return
+    else:
+        cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+        tmp = ast.literal_eval(cursor.fetchone()[1]) - events
+        cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
+
+    db.commit()
+
+
 def update_events(event_id: str) -> None:
     """
     Add information about event to the database, or update it, if the calendar or the last news title will be changed.
