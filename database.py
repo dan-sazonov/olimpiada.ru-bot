@@ -49,15 +49,13 @@ def add_events(user_id: int, events: set) -> None:
     :return: None
     """
     db, cursor = init_bd()
-    cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+    cur_events = get_events(user_id)
 
-    if not cursor.fetchone():
+    if not cur_events:
         cursor.execute("INSERT OR IGNORE INTO users(user, ids) VALUES(?, ?)", (user_id, str(events)))
     else:
-        cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
-        tmp = events.union(ast.literal_eval(cursor.fetchone()[1]))
-        events = events.union(tmp)
-        cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
+        tmp = str(events.union(cur_events))
+        cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': tmp, 'id': user_id})
 
     db.commit()
 
@@ -72,13 +70,12 @@ def remove_events(user_id: int, events: set) -> None:
     """
 
     db, cursor = init_bd()
-    cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+    cur_events = get_events(user_id)
 
-    if not cursor.fetchone():
+    if not cur_events:
         return
     else:
-        cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
-        tmp = str(ast.literal_eval(cursor.fetchone()[1]) - events)
+        tmp = str(cur_events - events)
         cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': tmp, 'id': user_id})
 
     db.commit()
