@@ -1,3 +1,7 @@
+"""
+Features that can be used in any files, and on the basis of which other functions can be created
+"""
+
 from datetime import datetime, date
 from bs4 import BeautifulSoup
 import requests

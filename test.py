@@ -1,3 +1,7 @@
+"""
+File with manual tests of some features. Will be deleted in production.
+"""
+
 import features
 import scrapper
 import requests

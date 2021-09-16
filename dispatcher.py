@@ -1,3 +1,8 @@
+"""
+Create and config the dispatcher of the telegram bot
+Everything that has to do with message processing should be put in `handlers`.
+"""
+
 import logging
 import os
 from aiogram import Bot, Dispatcher

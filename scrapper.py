@@ -1,3 +1,8 @@
+"""
+Features that use the parser and get some content from the site
+Also this file can contain classes for organizing this data.
+"""
+
 import requests
 import features
 from bs4 import BeautifulSoup, element

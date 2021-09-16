@@ -1,3 +1,9 @@
+"""
+Handlers of the telegram bot
+This file may contain functions that are responsible for the visual display and validation of data. The rest should be
+moved to other files: `features` or `database`.
+"""
+
 from aiogram import types
 from dispatcher import dp, bot
 import config

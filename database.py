@@ -1,3 +1,7 @@
+"""
+Features that using database or config it
+"""
+
 import sqlite3
 import ast
 import scrapper

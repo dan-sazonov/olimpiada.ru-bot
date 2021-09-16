@@ -1,3 +1,8 @@
+"""
+Main process of the bot
+All the functions should be created in other files.
+"""
+
 from aiogram import executor
 from dispatcher import dp
 import handlers
