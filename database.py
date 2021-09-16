@@ -67,7 +67,7 @@ def remove_events(user_id: int, events: set) -> None:
     db.commit()
 
 
-def update_events(event_id: str) -> None:
+def update_event(event_id: str) -> None:
     """
     Add information about event to the database, or update it, if the calendar or the last news title will be changed.
     If event's id is invalid, the err will be raised
@@ -97,6 +97,10 @@ def update_events(event_id: str) -> None:
                            {'nd': a.last_news_date, 'nt': a.last_news_title, 'c': str(a.calendar),
                             'nr': a.next_round_title, 'd': a.next_round_date, 'es': a.status, 'id': a.id})
     db.commit()
+
+
+def get_statuses(user_id: int) -> dict:
+    pass
 
 
 if __name__ == "__main__":
