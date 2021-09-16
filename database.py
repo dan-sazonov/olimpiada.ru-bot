@@ -23,6 +23,23 @@ def init_bd() -> (sqlite3.Connection, sqlite3.Cursor):
     return db, cursor
 
 
+def get_events(user_id: int) -> set:
+    """
+    Return a set of ids of all user olympiads
+
+    :param user_id: user's telegram id
+    :return: set of olympiad ids, int
+    """
+    db, cursor = init_bd()
+    cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+
+    if not cursor.fetchone():
+        return set()
+    else:
+        cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+        return ast.literal_eval(cursor.fetchone()[1])
+
+
 def add_events(user_id: int, events: set) -> None:
     """
     Add events to the database for the selected user
@@ -61,8 +78,8 @@ def remove_events(user_id: int, events: set) -> None:
         return
     else:
         cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
-        tmp = ast.literal_eval(cursor.fetchone()[1]) - events
-        cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
+        tmp = str(ast.literal_eval(cursor.fetchone()[1]) - events)
+        cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': tmp, 'id': user_id})
 
     db.commit()
 
