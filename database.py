@@ -159,5 +159,24 @@ def get_next_events(user_id: int) -> list[tuple[str, str, str]]:
     return events
 
 
+def get_last_news(user_id: int) -> list[tuple[str, str, str]]:
+    """
+    Return the latest news of all user events
+
+    :param user_id: user's telegram id
+    :return: list with tuples ('title', 'news date', 'news title')
+    """
+    db, cursor = init_bd()
+    news = []
+
+    for event in get_events(user_id):
+        cursor.execute("SELECT title, news_date, news_title FROM events WHERE id = :id", {'id': event})
+        tmp = cursor.fetchone()
+        if tmp[1] and tmp[2]:
+            news.append((tmp[0], tmp[1], tmp[2]))
+
+    return news
+
+
 if __name__ == "__main__":
     init_bd()
