@@ -5,6 +5,7 @@ Features that using database or config it
 import sqlite3
 import ast
 import scrapper
+import datetime
 
 
 def init_bd() -> (sqlite3.Connection, sqlite3.Cursor):
@@ -16,7 +17,8 @@ def init_bd() -> (sqlite3.Connection, sqlite3.Cursor):
     db = sqlite3.connect('main.db')
     cursor = db.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, title TEXT, news_date TIMESTAMP, "
-                   "news_title TEXT, calendar TEXT, next_round TEXT, next_date TIMESTAMP, event_status TEXT)")
+                   "news_title TEXT, calendar TEXT, next_round TEXT, next_date TIMESTAMP, event_status TEXT, "
+                   "last_update TIMESTAMP)")
     cursor.execute("CREATE TABLE IF NOT EXISTS users(user INTEGER PRIMARY KEY, ids TEXT)")
     db.commit()
 
@@ -84,32 +86,40 @@ def remove_events(user_id: int, events: set) -> None:
 def update_event(event_id: str) -> None:
     """
     Add information about event to the database, or update it, if the calendar or the last news title will be changed.
-    If event's id is invalid, the err will be raised
+    If less than 5 and a half hours have passed since the last update, the function will be aborted. If event's id is
+    invalid, the err will be raised
 
     :param event_id: event's id
     :return: None
     """
-    a = scrapper.Event(event_id)
-    data = (a.id, a.title, a.last_news_date, a.last_news_title, str(a.calendar), a.next_round_title, a.next_round_date,
-            a.status)
-
     db, cursor = init_bd()
     cursor.execute("SELECT * FROM events WHERE id = :id", {'id': int(event_id)})
+    fetch = cursor.fetchone()
 
-    if not cursor.fetchone():
+    # abort the function if not enough time has passed
+    delta_sec = 19801 if not fetch else (datetime.datetime.now() - datetime.datetime.fromisoformat(fetch[-1])).seconds
+    if delta_sec <= 19800:
+        return
+    # run parser and get class
+    a = scrapper.Event(event_id)
+    data = (a.id, a.title, a.last_news_date, a.last_news_title, str(a.calendar), a.next_round_title, a.next_round_date,
+            a.status, datetime.datetime.now())
+
+    if not fetch:
         # add the event
         cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, calendar, next_round, next_date,"
-                       "event_status) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", data)
-    else:
-        cursor.execute("SELECT * FROM events WHERE id = :id", {'id': int(event_id)})
-        f = cursor.fetchone()
-        tmp_last_news_date, tmp_calendar = f[2], f[4]
-        if tmp_last_news_date != a.last_news_date or tmp_calendar != str(a.calendar):
-            # update the event
-            cursor.execute("UPDATE events SET news_date = :nd, news_title = :nt, calendar = :c, next_round = :nr, "
-                           "next_date = :d, event_status = :es WHERE id = :id",
-                           {'nd': a.last_news_date, 'nt': a.last_news_title, 'c': str(a.calendar),
-                            'nr': a.next_round_title, 'd': a.next_round_date, 'es': a.status, 'id': a.id})
+                       "event_status, last_update) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        db.commit()
+        return
+
+    tmp_last_news_date, tmp_calendar = fetch[2], fetch[4]
+    if tmp_last_news_date != a.last_news_date or tmp_calendar != str(a.calendar):
+        # update the event
+        cursor.execute("UPDATE events SET news_date = :nd, news_title = :nt, calendar = :c, next_round = :nr, "
+                       "next_date = :d, event_status = :es, last_update = :ld WHERE id = :id",
+                       {'nd': a.last_news_date, 'nt': a.last_news_title, 'c': str(a.calendar),
+                        'nr': a.next_round_title, 'd': a.next_round_date, 'es': a.status, 'ld': datetime.datetime.now(),
+                        'id': a.id})
     db.commit()
 
 
