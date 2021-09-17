@@ -7,6 +7,8 @@ import requests
 import features
 from bs4 import BeautifulSoup, element
 
+global_data = {'parsed_page': element.ResultSet, 'last_url': ''}  # bad practise, I know
+
 
 def get_html(url: str, selector: str) -> element.ResultSet:
     """
@@ -14,16 +16,21 @@ def get_html(url: str, selector: str) -> element.ResultSet:
 
     :param url: url that needs to be parsed
     :param selector: CSS-selector of the desired element
-    :return: HTML code
+    :return: HTML code of this element
     """
-    try:
-        response = requests.get(url.rstrip('/'))
-    except requests.exceptions.ConnectionError or requests.exceptions.MissingSchema:
-        # do something if url is wrong
-        return element.ResultSet('')
-    soup = BeautifulSoup(response.text, 'lxml')
+    global global_data
 
-    return soup.select(selector)
+    if (not global_data['parsed_page']) or (global_data['last_url'] != url):
+        # parse the page if it hasn't been done yet
+        global_data['last_url'] = url
+        try:
+            response = requests.get(url.rstrip('/'))
+        except requests.exceptions.ConnectionError or requests.exceptions.MissingSchema:
+            # do something if url is wrong
+            return element.ResultSet('')
+        global_data['parsed_page'] = BeautifulSoup(response.text, 'lxml').find('body')
+
+    return global_data['parsed_page'].select(selector)
 
 
 def get_title(url: str) -> str:
