@@ -140,5 +140,24 @@ def get_statuses(user_id: int) -> list[tuple[str, str]]:
     return statuses
 
 
+def get_next_events(user_id: int) -> list[tuple[str, str, str]]:
+    """
+    Return the information about next rounds of all user events
+
+    :param user_id: user's telegram id
+    :return: list with tuples ('title', 'round-title', 'date')
+    """
+    db, cursor = init_bd()
+    events = []
+
+    for event in get_events(user_id):
+        cursor.execute("SELECT title, next_round, next_date FROM events WHERE id = :id", {'id': event})
+        tmp = cursor.fetchone()
+        if tmp[1] and tmp[2]:
+            events.append((tmp[0], tmp[1], '.'.join(tmp[2].split('-')[::-1])))
+
+    return events
+
+
 if __name__ == "__main__":
     init_bd()
