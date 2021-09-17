@@ -123,8 +123,21 @@ def update_event(event_id: str) -> None:
     db.commit()
 
 
-def get_statuses(user_id: int) -> dict:
-    pass
+def get_statuses(user_id: int) -> list[tuple[str, str]]:
+    """
+    Return the statuses of all user events
+
+    :param user_id: user's telegram id
+    :return: list with pairs 'title', 'status' in the tuples
+    """
+    db, cursor = init_bd()
+    statuses = []
+
+    for event in get_events(user_id):
+        cursor.execute("SELECT title, event_status FROM events WHERE id = :id", {'id': event})
+        statuses.append(cursor.fetchone())
+
+    return statuses
 
 
 if __name__ == "__main__":
