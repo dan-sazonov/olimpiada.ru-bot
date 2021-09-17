@@ -93,16 +93,28 @@ def get_status(url: str) -> str:
     return out[0].text.rstrip(' →') if out else ''
 
 
-class ParsedEvent(object):
-    def __init__(self, url: str):
+class Event(object):
+    def __init__(self, url: str, title='', last_news_date='', last_news_title='', calendar='', next_round_title='',
+                 next_round_date='', status=''):
         """
         Parse the event and set the class attributes
 
         :param url: url or id of this event
         """
+        # validate url or id, create attributes
         self.url, self.id = features.validate_url(url)
-        self.title = get_title(self.url)
-        self.last_news_date, self.last_news_title = get_last_news(self.url)
-        self.calendar = get_calendar(self.url)
-        self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
-        self.status = get_status(self.url)
+
+        if any((title, last_news_date, last_news_title, calendar, next_round_title, next_round_date, status)):
+            # set attributes based on the received values
+            self.title = title
+            self.last_news_date, self.last_news_title = last_news_date, last_news_title
+            self.calendar = calendar
+            self.next_round_title, self.next_round_date = next_round_title, next_round_date
+            self.status = status
+        else:
+            # set the attributes based on received data from the parser
+            self.title = get_title(self.url)
+            self.last_news_date, self.last_news_title = get_last_news(self.url)
+            self.calendar = get_calendar(self.url)
+            self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
+            self.status = get_status(self.url)

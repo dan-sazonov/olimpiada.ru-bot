@@ -89,7 +89,7 @@ def update_event(event_id: str) -> None:
     :param event_id: event's id
     :return: None
     """
-    a = scrapper.ParsedEvent(event_id)
+    a = scrapper.Event(event_id)
     data = (a.id, a.title, a.last_news_date, a.last_news_title, str(a.calendar), a.next_round_title, a.next_round_date,
             a.status)
 
