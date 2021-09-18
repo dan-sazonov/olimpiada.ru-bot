@@ -12,7 +12,7 @@ global_data = {'parsed_page': element.ResultSet, 'last_url': ''}  # bad practise
 
 def get_html(url: str, selector: str) -> element.ResultSet:
     """
-    Returns the html code by selector and validate the url
+    Return the html code by selector and validate the url
 
     :param url: url that needs to be parsed
     :param selector: CSS-selector of the desired element
@@ -35,7 +35,7 @@ def get_html(url: str, selector: str) -> element.ResultSet:
 
 def get_title(url: str) -> str:
     """
-    Returns the name of the competition by the url
+    Return the name of the competition by the url
 
     :param url: url of the competition
     :return: title of this competition
@@ -47,7 +47,7 @@ def get_title(url: str) -> str:
 
 def get_last_news(url: str) -> tuple[str, str]:
     """
-    Returns the title of the latest news about this competition. If the news title contains link to the article, this
+    Return the title of the latest news about this competition. If the news title contains link to the article, this
     link will be added to the title
 
     :param url: url of the competition
@@ -68,7 +68,7 @@ def get_last_news(url: str) -> tuple[str, str]:
 
 def get_calendar(url: str) -> list[tuple[list, str]]:
     """
-    Returns calendar with the schedule of this competition
+    Return calendar with the schedule of this competition
 
     :param url: url of the competition
     :return: dict: {'name of this round': 'date of the event'}
