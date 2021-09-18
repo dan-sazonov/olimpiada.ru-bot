@@ -23,7 +23,7 @@ def test_parsing(url: str) -> bool:
     return bool(soup.select('.headline_activity h1'))
 
 
-def validate_url(url: str) -> (str, int):
+def validate_url(url: str) -> tuple[str, int]:
     """
     Return correct url and id if getting only id. If url is invalid, returns empty string. Otherwise, returns url
 
@@ -39,7 +39,7 @@ def validate_url(url: str) -> (str, int):
     return url, int(event_id)
 
 
-def convert_date(usr_date: str, is_upcoming=False) -> (datetime.date, bool):
+def convert_date(usr_date: str, is_upcoming=False) -> tuple[datetime.date, bool]:
     """
     Convert a user-friendly date to a datetime object. If this day was already in this year, the value of the year will
     be equal to the current one, otherwise the previous one. If the is_upcoming flag is set to True and this day was
