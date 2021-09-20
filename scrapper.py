@@ -5,6 +5,7 @@ Also this file can contain classes for organizing this data.
 
 import requests
 import features
+import datetime
 from bs4 import BeautifulSoup, element
 
 global_data = {'parsed_page': element.ResultSet, 'last_url': ''}  # bad practise, I know
@@ -101,27 +102,36 @@ def get_status(url: str) -> str:
 
 
 class Event(object):
-    def __init__(self, url: str, title='', last_news_date='', last_news_title='', calendar='', next_round_title='',
-                 next_round_date='', status=''):
+    def __init__(self, e_id: int, title='', last_news_date='', last_news_title='', calendar='', next_round_title='',
+                 next_round_date='', status='', last_update=''):
         """
         Parse the event and set the class attributes
 
-        :param url: url or id of this event
+        :param e_id: id of this event
         """
         # validate url or id, create attributes
-        self.url, self.id = features.validate_url(url)
-
-        if any((title, last_news_date, last_news_title, calendar, next_round_title, next_round_date, status)):
-            # set attributes based on the received values
-            self.title = title
-            self.last_news_date, self.last_news_title = last_news_date, last_news_title
-            self.calendar = calendar
-            self.next_round_title, self.next_round_date = next_round_title, next_round_date
-            self.status = status
-        else:
-            # set the attributes based on received data from the parser
-            self.title = get_title(self.url)
-            self.last_news_date, self.last_news_title = get_last_news(self.url)
-            self.calendar = get_calendar(self.url)
-            self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
-            self.status = get_status(self.url)
+        self.id = e_id
+        self.url = features.create_url(self.id)
+        self.title = title
+        self.last_news_date, self.last_news_title = last_news_date, last_news_title
+        self.calendar = calendar
+        self.next_round_title, self.next_round_date = next_round_title, next_round_date
+        self.status = status
+        self.last_update = datetime.datetime.fromisoformat(last_update)
+        # todo kill me please
+        # if any((title, last_news_date, last_news_title, calendar, next_round_title, next_round_date, status)):
+        # set attributes based on the received values
+        # self.title = title
+        # self.last_news_date, self.last_news_title = last_news_date, last_news_title
+        # self.calendar = calendar
+        # self.next_round_title, self.next_round_date = next_round_title, next_round_date
+        # self.status = status
+        # else:
+        #     print('fuck')
+        #     # set the attributes based on received data from the parser
+        #     self.title = get_title(self.url)
+        #     self.last_news_date, self.last_news_title = get_last_news(self.url)
+        #     self.calendar = get_calendar(self.url)
+        #     self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
+        #     self.status = get_status(self.url)
+#               self.last_update = datetime now

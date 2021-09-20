@@ -55,6 +55,11 @@ class DB:
         self.cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
         self.db.commit()
 
+    def select_from_events(self, event_id: int, cols: list[str]):
+        # don't use placeholders in this request, '*' won't work!
+        self.cursor.execute(f"SELECT {', '.join(cols)} FROM events WHERE id = {int(event_id)}")
+        return self.cursor.fetchone()
+
 
 db = DB()
 
@@ -109,7 +114,7 @@ def remove_events(user_id: int, events: set) -> None:
     db.update_users(user_id, tmp)
 
 
-def update_event(event_id: str) -> None:
+def update_event(event_id: int) -> None:
     """
     Add information about event to the database, or update it, if the calendar or the last news title will be changed.
     If less than 5 and a half hours have passed since the last update, the function will be aborted. If event's id is
@@ -118,35 +123,42 @@ def update_event(event_id: str) -> None:
     :param event_id: event's id
     :return: None
     """
-    db, cursor = init_bd()
-    cursor.execute("SELECT * FROM events WHERE id = :id", {'id': int(event_id)})
-    fetch = cursor.fetchone()
+
+    event = scrapper.Event(*db.select_from_events(event_id, ['*']))
 
     # abort the function if not enough time has passed
-    delta_sec = 19801 if not fetch else (datetime.datetime.now() - datetime.datetime.fromisoformat(fetch[-1])).seconds
-    if delta_sec <= 19800:
-        return
-    # run parser and get class
-    a = scrapper.Event(event_id)
-    data = (a.id, a.title, a.last_news_date, a.last_news_title, str(a.calendar), a.next_round_title, a.next_round_date,
-            a.status, datetime.datetime.now())
-
-    if not fetch:
-        # add the event
-        cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, calendar, next_round, next_date,"
-                       "event_status, last_update) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-        db.commit()
+    delta_time = None if not event else (datetime.datetime.now() - event.last_update)
+    if delta_time and delta_time.seconds <= 19800 and delta_time.days < 1:
         return
 
-    tmp_last_news_date, tmp_calendar = fetch[2], fetch[4]
-    if tmp_last_news_date != a.last_news_date or tmp_calendar != str(a.calendar):
-        # update the event
-        cursor.execute("UPDATE events SET news_date = :nd, news_title = :nt, calendar = :c, next_round = :nr, "
-                       "next_date = :d, event_status = :es, last_update = :ld WHERE id = :id",
-                       {'nd': a.last_news_date, 'nt': a.last_news_title, 'c': str(a.calendar),
-                        'nr': a.next_round_title, 'd': a.next_round_date, 'es': a.status, 'ld': datetime.datetime.now(),
-                        'id': a.id})
-    db.commit()
+    if not event:
+        # парсим страницу, инсертим в бд строку
+        pass
+    else:
+        # сравниваем текущую дату новости из бд и календарь с распаршенными, если поменялись - апдейтим ивент
+        pass
+
+    # # run parser and get class
+    # a = scrapper.Event(event_id)
+    # data = (a.id, a.title, a.last_news_date, a.last_news_title, str(a.calendar), a.next_round_title, a.next_round_date,
+    #         a.status, datetime.datetime.now())
+    #
+    # if not fetch:
+    #     # add the event
+    #     cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, calendar, next_round, next_date,"
+    #                    "event_status, last_update) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+    #     db.commit()
+    #     return
+    #
+    # tmp_last_news_date, tmp_calendar = fetch[2], fetch[4]
+    # if tmp_last_news_date != a.last_news_date or tmp_calendar != str(a.calendar):
+    #     # update the event
+    #     cursor.execute("UPDATE events SET news_date = :nd, news_title = :nt, calendar = :c, next_round = :nr, "
+    #                    "next_date = :d, event_status = :es, last_update = :ld WHERE id = :id",
+    #                    {'nd': a.last_news_date, 'nt': a.last_news_title, 'c': str(a.calendar),
+    #                     'nr': a.next_round_title, 'd': a.next_round_date, 'es': a.status, 'ld': datetime.datetime.now(),
+    #                     'id': a.id})
+    # db.commit()
 
 
 # fuck the DRY, I want it like this
