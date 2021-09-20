@@ -170,77 +170,77 @@ def update_event(event_id: int) -> None:
         db.update_events(event_id, data_set)
 
 
-# fuck the DRY, I want it like this
-def get_statuses(user_id: int) -> list[tuple[str, str]]:
-    """
-    Return the statuses of all user events
-
-    :param user_id: user's telegram id
-    :return: list with pairs 'title', 'status' in the tuples
-    """
-    db, cursor = init_bd()
-    statuses = []
-
-    for event in get_events(user_id):
-        cursor.execute("SELECT title, event_status FROM events WHERE id = :id", {'id': event})
-        statuses.append(cursor.fetchone())
-
-    return statuses
-
-
-def get_next_rounds(user_id: int) -> list[tuple[str, str, str]]:
-    """
-    Return the information about next rounds of all user events
-
-    :param user_id: user's telegram id
-    :return: list with tuples ('title', 'round-title', 'date')
-    """
-    db, cursor = init_bd()
-    rounds = []
-
-    for event in get_events(user_id):
-        cursor.execute("SELECT title, next_round, next_date FROM events WHERE id = :id", {'id': event})
-        tmp = cursor.fetchone()
-        if tmp[1] and tmp[2]:
-            rounds.append((tmp[0], tmp[1], '.'.join(tmp[2].split('-')[::-1])))
-
-    return rounds
-
-
-def get_last_news(user_id: int) -> list[tuple[str, str, str]]:
-    """
-    Return the latest news of all user events
-
-    :param user_id: user's telegram id
-    :return: list with tuples ('title', 'news date', 'news title')
-    """
-    db, cursor = init_bd()
-    news = []
-
-    for event in get_events(user_id):
-        cursor.execute("SELECT title, news_date, news_title FROM events WHERE id = :id", {'id': event})
-        tmp = cursor.fetchone()
-        if tmp[1] and tmp[2]:
-            news.append((tmp[0], tmp[1], tmp[2]))
-
-    return news
-
-
-def get_users_events(user_id: int) -> list[tuple[str, str, str]]:
-    """
-    Return title, id and time of last updating of all user events
-    :param user_id: user's telegram id
-    :return: list with tuples ('title', 'news date', 'news title')
-    """
-    db, cursor = init_bd()
-    events = []
-
-    for event in get_events(user_id):
-        cursor.execute("SELECT title, last_update FROM events WHERE id = :id", {'id': event})
-        tmp = cursor.fetchone()
-        events.append((event, tmp[0], tmp[1].split()[1].split('.')[0]))
-
-    return events
+# # fuck the DRY, I want it like this
+# def get_statuses(user_id: int) -> list[tuple[str, str]]:
+#     """
+#     Return the statuses of all user events
+#
+#     :param user_id: user's telegram id
+#     :return: list with pairs 'title', 'status' in the tuples
+#     """
+#     db, cursor = init_bd()
+#     statuses = []
+#
+#     for event in get_events(user_id):
+#         cursor.execute("SELECT title, event_status FROM events WHERE id = :id", {'id': event})
+#         statuses.append(cursor.fetchone())
+#
+#     return statuses
+#
+#
+# def get_next_rounds(user_id: int) -> list[tuple[str, str, str]]:
+#     """
+#     Return the information about next rounds of all user events
+#
+#     :param user_id: user's telegram id
+#     :return: list with tuples ('title', 'round-title', 'date')
+#     """
+#     db, cursor = init_bd()
+#     rounds = []
+#
+#     for event in get_events(user_id):
+#         cursor.execute("SELECT title, next_round, next_date FROM events WHERE id = :id", {'id': event})
+#         tmp = cursor.fetchone()
+#         if tmp[1] and tmp[2]:
+#             rounds.append((tmp[0], tmp[1], '.'.join(tmp[2].split('-')[::-1])))
+#
+#     return rounds
+#
+#
+# def get_last_news(user_id: int) -> list[tuple[str, str, str]]:
+#     """
+#     Return the latest news of all user events
+#
+#     :param user_id: user's telegram id
+#     :return: list with tuples ('title', 'news date', 'news title')
+#     """
+#     db, cursor = init_bd()
+#     news = []
+#
+#     for event in get_events(user_id):
+#         cursor.execute("SELECT title, news_date, news_title FROM events WHERE id = :id", {'id': event})
+#         tmp = cursor.fetchone()
+#         if tmp[1] and tmp[2]:
+#             news.append((tmp[0], tmp[1], tmp[2]))
+#
+#     return news
+#
+#
+# def get_users_events(user_id: int) -> list[tuple[str, str, str]]:
+#     """
+#     Return title, id and time of last updating of all user events
+#     :param user_id: user's telegram id
+#     :return: list with tuples ('title', 'news date', 'news title')
+#     """
+#     db, cursor = init_bd()
+#     events = []
+#
+#     for event in get_events(user_id):
+#         cursor.execute("SELECT title, last_update FROM events WHERE id = :id", {'id': event})
+#         tmp = cursor.fetchone()
+#         events.append((event, tmp[0], tmp[1].split()[1].split('.')[0]))
+#
+#     return events
 
 
 if __name__ == "__main__":
