@@ -25,7 +25,7 @@ class DB:
 
     def select_from_users(self, user_id: int) -> tuple:
         """
-        Select ids from the 'users' table by user's id
+        Return ids from the 'users' table by user's id
 
         :param user_id: user's telegram id and key in the table
         :return: tuple with data from the table
@@ -33,7 +33,14 @@ class DB:
         self.cursor.execute("SELECT ids FROM users WHERE user = :id", {'id': user_id})
         return self.cursor.fetchone()
 
-    def select_from_events(self, event_id: int, cols: list[str]):
+    def select_from_events(self, event_id: int, cols: list[str]) -> tuple:
+        """
+        Return data from the specified columns of the 'events' table according to the user's id
+
+        :param event_id: id of the event
+        :param cols: name of the columns, or ['*'] if you want to select all of them
+        :return: tuple with data from the table
+        """
         # don't use placeholders in this request, '*' won't work!
         self.cursor.execute(f"SELECT {', '.join(cols)} FROM events WHERE id = {int(event_id)}")
         return self.cursor.fetchone()
@@ -143,23 +150,10 @@ def update_event(event_id: int) -> None:
     if not event:
         db.insert_into_events(parsed_data)
         return
-    else:
-        # сравниваем текущую дату новости из бд и календарь с распаршенными, если поменялись - апдейтим ивент
+    if event.last_news_date != parsed_data.last_news_date or event.calendar != parsed_data.calendar:
         pass
 
     # # run parser and get class
-    # a = scrapper.Event(event_id)
-    # data = (a.id, a.title, a.last_news_date, a.last_news_title, str(a.calendar), a.next_round_title, a.next_round_date,
-    #         a.status, datetime.datetime.now())
-    #
-    # if not fetch:
-    #     # add the event
-    #     cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, calendar, next_round, next_date,"
-    #                    "event_status, last_update) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-    #     db.commit()
-    #     return
-    #
-    # tmp_last_news_date, tmp_calendar = fetch[2], fetch[4]
     # if tmp_last_news_date != a.last_news_date or tmp_calendar != str(a.calendar):
     #     # update the event
     #     cursor.execute("UPDATE events SET news_date = :nd, news_title = :nt, calendar = :c, next_round = :nr, "
@@ -169,6 +163,7 @@ def update_event(event_id: int) -> None:
     #                     'id': a.id})
     # db.commit()
 
+update_event(465)
 
 # fuck the DRY, I want it like this
 def get_statuses(user_id: int) -> list[tuple[str, str]]:
