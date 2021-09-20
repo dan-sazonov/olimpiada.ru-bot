@@ -8,21 +8,24 @@ import scrapper
 import datetime
 
 
-def init_bd() -> (sqlite3.Connection, sqlite3.Cursor):
-    """
-    Initialize 'events' and 'users' databases if they don't exist
+class DB(object):
+    def __init__(self):
+        """
+        Initialize 'events' and 'users' databases if they don't exist and set attributes
+        """
+        db = sqlite3.connect('main.db')
+        cursor = db.cursor()
+        self.db, self.cursor = db, cursor
 
-    :return: (Connection db object, Cursor db.object)
-    """
-    db = sqlite3.connect('main.db')
-    cursor = db.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, title TEXT, news_date TIMESTAMP, "
-                   "news_title TEXT, calendar TEXT, next_round TEXT, next_date TIMESTAMP, event_status TEXT, "
-                   "last_update TIMESTAMP)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS users(user INTEGER PRIMARY KEY, ids TEXT)")
-    db.commit()
+        cursor.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, title TEXT, news_date TIMESTAMP, "
+                       "news_title TEXT, calendar TEXT, next_round TEXT, next_date TIMESTAMP, event_status TEXT, "
+                       "last_update TIMESTAMP)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users(user INTEGER PRIMARY KEY, ids TEXT)")
+        db.commit()
 
-    return db, cursor
+
+def init_bd():
+    return '', ''
 
 
 def get_events(user_id: int) -> set:
