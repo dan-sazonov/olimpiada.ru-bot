@@ -33,6 +33,17 @@ class DB:
         self.cursor.execute("SELECT ids FROM users WHERE user = :id", {'id': user_id})
         return self.cursor.fetchone()
 
+    def insert_into_users(self, user_id: int, events: set) -> None:
+        """
+        Insert into the 'users' table set of event ids
+
+        :param user_id: user's telegram id and key in the table
+        :param events: set with event ids
+        :return: None
+        """
+        self.cursor.execute("INSERT OR IGNORE INTO users(user, ids) VALUES(?, ?)", (user_id, str(events)))
+        self.db.commit()
+
 
 db = DB()
 
@@ -61,16 +72,15 @@ def add_events(user_id: int, events: set) -> None:
     :param events: set of olympiad ids, int
     :return: None
     """
-    db, cursor = init_bd()
     cur_events = get_events(user_id)
 
     if not cur_events:
-        cursor.execute("INSERT OR IGNORE INTO users(user, ids) VALUES(?, ?)", (user_id, str(events)))
+        db.insert_into_users(user_id, events)
     else:
         tmp = str(events.union(cur_events))
-        cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': tmp, 'id': user_id})
+        # cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': tmp, 'id': user_id})
 
-    db.commit()
+    # db.commit()
 
 
 def remove_events(user_id: int, events: set) -> None:
