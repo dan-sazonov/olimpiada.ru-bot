@@ -8,7 +8,7 @@ import scrapper
 import datetime
 
 
-class DB(object):
+class DB:
     def __init__(self):
         """
         Initialize 'events' and 'users' databases if they don't exist and set attributes
@@ -23,6 +23,19 @@ class DB(object):
         cursor.execute("CREATE TABLE IF NOT EXISTS users(user INTEGER PRIMARY KEY, ids TEXT)")
         db.commit()
 
+    def select_from_users(self, user_id: int) -> tuple:
+        """
+        Select ids from the 'users' table by user's id
+
+        :param user_id: user's telegram id and key in the table
+        :return: tuple with data from the table
+        """
+        self.cursor.execute("SELECT ids FROM users WHERE user = :id", {'id': user_id})
+        return self.cursor.fetchone()
+
+
+db = DB()
+
 
 def init_bd():
     return '', ''
@@ -30,19 +43,14 @@ def init_bd():
 
 def get_events(user_id: int) -> set:
     """
-    Return a set of ids of all user olympiads
+    Return a set of ids of all user events
 
     :param user_id: user's telegram id
     :return: set of olympiad ids, int
     """
-    db, cursor = init_bd()
-    cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
+    out = db.select_from_users(user_id)
 
-    if not cursor.fetchone():
-        return set()
-    else:
-        cursor.execute("SELECT * FROM users WHERE user = :id", {'id': user_id})
-        return ast.literal_eval(cursor.fetchone()[1])
+    return set() if not out else ast.literal_eval(out[0])
 
 
 def add_events(user_id: int, events: set) -> None:
