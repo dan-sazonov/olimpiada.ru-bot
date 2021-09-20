@@ -74,6 +74,18 @@ class DB:
         self.cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
         self.db.commit()
 
+    def update_events(self, event_id: int, data: dict[str:str]) -> None:
+        """
+        Updates values from the 'data' dict in the 'events' table for a specific event id
+
+        :param event_id: id of the event
+        :param data: {'name_of_column': 'new value'}
+        :return: None
+        """
+        data_set = ', '.join([f'{i[0]} = "{i[1]}"' for i in data.items()])
+        self.cursor.execute(f"UPDATE events SET {data_set} WHERE id = {event_id}")
+        self.db.commit()
+
 
 db = DB()
 
@@ -151,19 +163,12 @@ def update_event(event_id: int) -> None:
         db.insert_into_events(parsed_data)
         return
     if event.last_news_date != parsed_data.last_news_date or event.calendar != parsed_data.calendar:
-        pass
+        pd = parsed_data
+        data_set = {'news_date': pd.last_news_date, 'news_title': pd.last_news_title, 'calendar': str(pd.calendar),
+                    'next_round': pd.next_round_title, 'next_date': pd.next_round_date, 'event_status': pd.status,
+                    'last_update': datetime.datetime.now()}
+        db.update_events(event_id, data_set)
 
-    # # run parser and get class
-    # if tmp_last_news_date != a.last_news_date or tmp_calendar != str(a.calendar):
-    #     # update the event
-    #     cursor.execute("UPDATE events SET news_date = :nd, news_title = :nt, calendar = :c, next_round = :nr, "
-    #                    "next_date = :d, event_status = :es, last_update = :ld WHERE id = :id",
-    #                    {'nd': a.last_news_date, 'nt': a.last_news_title, 'c': str(a.calendar),
-    #                     'nr': a.next_round_title, 'd': a.next_round_date, 'es': a.status, 'ld': datetime.datetime.now(),
-    #                     'id': a.id})
-    # db.commit()
-
-update_event(465)
 
 # fuck the DRY, I want it like this
 def get_statuses(user_id: int) -> list[tuple[str, str]]:
