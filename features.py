@@ -3,8 +3,31 @@ Features that can be used in any files, and on the basis of which other function
 """
 
 from datetime import datetime, date
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, element
 import requests
+
+global_data = {'parsed_page': element.ResultSet, 'last_url': ''}  # bad practise, I know
+
+
+def get_element(url: str, selector: str) -> element.ResultSet:
+    """
+    Return the html code by selector and validate the url
+
+    :param url: url that needs to be parsed
+    :param selector: CSS-selector of the desired element
+    :return: HTML code of this element
+    """
+    if (not global_data['parsed_page']) or (global_data['last_url'] != url):
+        # parse the page if it hasn't been done yet
+        try:
+            response = requests.get(url.rstrip('/'))
+        except requests.exceptions.ConnectionError or requests.exceptions.MissingSchema:
+            return element.ResultSet('')
+
+        global_data['last_url'] = url
+        global_data['parsed_page'] = BeautifulSoup(response.text, 'lxml').find('body')
+
+    return global_data['parsed_page'].select(selector)
 
 
 def test_parsing(url: str) -> bool:
@@ -14,13 +37,8 @@ def test_parsing(url: str) -> bool:
     :param url: url of this page
     :return: bool flag
     """
-    try:
-        response = requests.get(url.rstrip('/'))
-    except:
-        return False
-    soup = BeautifulSoup(response.text, 'lxml')
 
-    return bool(soup.select('.headline_activity h1'))
+    return bool(get_element(url, '.headline_activity h1'))
 
 
 def create_url(event_id: int) -> str:

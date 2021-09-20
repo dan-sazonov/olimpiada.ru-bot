@@ -9,7 +9,7 @@ import requests
 testing = list(range(1, 6)) + [73, 153, 465, 22, 5283]
 
 for i in testing:
-    article = scrapper.Event(str(465))
+    article = scrapper.get_event('2')
 
     print(article.id, article.url)
     print(article.title)
