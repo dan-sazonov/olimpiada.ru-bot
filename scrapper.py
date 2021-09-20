@@ -1,37 +1,29 @@
 """
-Features that use the parser and get some content from the site
+Features that process data received from the parser
 Also this file can contain classes for organizing this data.
 """
-
-import requests
 import features
 import datetime
-from bs4 import BeautifulSoup, element
 
-global_data = {'parsed_page': element.ResultSet, 'last_url': ''}  # bad practise, I know
+get_element = features.get_element  # parser
 
 
-def get_html(url: str, selector: str) -> element.ResultSet:
-    """
-    Return the html code by selector and validate the url
+class Event(object):
+    def __init__(self, e_id: int, title='', last_news_date='', last_news_title='', calendar='', next_round_title='',
+                 next_round_date='', status='', last_update=datetime.datetime.now()):
+        """
+        Information about the event as in the database
 
-    :param url: url that needs to be parsed
-    :param selector: CSS-selector of the desired element
-    :return: HTML code of this element
-    """
-    global global_data
-
-    if (not global_data['parsed_page']) or (global_data['last_url'] != url):
-        # parse the page if it hasn't been done yet
-        global_data['last_url'] = url
-        try:
-            response = requests.get(url.rstrip('/'))
-        except requests.exceptions.ConnectionError or requests.exceptions.MissingSchema:
-            # do something if url is wrong
-            return element.ResultSet('')
-        global_data['parsed_page'] = BeautifulSoup(response.text, 'lxml').find('body')
-
-    return global_data['parsed_page'].select(selector)
+        :param e_id: id of this event
+        """
+        self.id = e_id
+        self.url = features.create_url(self.id)
+        self.title = title
+        self.last_news_date, self.last_news_title = last_news_date, last_news_title
+        self.calendar = calendar
+        self.next_round_title, self.next_round_date = next_round_title, next_round_date
+        self.status = status
+        self.last_update = datetime.datetime.fromisoformat(str(last_update))
 
 
 def get_title(url: str) -> str:
@@ -41,7 +33,7 @@ def get_title(url: str) -> str:
     :param url: url of the competition
     :return: title of this competition
     """
-    out = get_html(url, '.headline_activity h1')
+    out = get_element(url, '.headline_activity h1')
 
     return out[0].text if out else ''
 
@@ -54,7 +46,7 @@ def get_last_news(url: str) -> tuple[str, str]:
     :param url: url of the competition
     :return: date of publishing and title of this news: (date, title)
     """
-    out = get_html(url, '#new_for_activity a.new_link:first-child')
+    out = get_element(url, '#new_for_activity a.new_link:first-child')
 
     if not out:
         return '', ''
@@ -77,7 +69,7 @@ def get_calendar(url: str) -> list[tuple[list, str]]:
     i = 0
     calendar = list()
 
-    out = get_html(url, '.left > .events_for_activity')
+    out = get_element(url, '.left > .events_for_activity')
     if not out:
         return list()
     out = out[0].select('td > a')
@@ -96,42 +88,28 @@ def get_status(url: str) -> str:
     :param url: url of the competition
     :return: current status
     """
-    out = get_html(url, '.headline_activity a.red')
+    out = get_element(url, '.headline_activity a.red')
 
     return out[0].text.rstrip(' →') if out else ''
 
 
-class Event(object):
-    def __init__(self, e_id: int, title='', last_news_date='', last_news_title='', calendar='', next_round_title='',
-                 next_round_date='', status='', last_update=''):
-        """
-        Parse the event and set the class attributes
+def get_event(url: str) -> Event:
+    """
+    Parse the event page and return the class with all the information
 
-        :param e_id: id of this event
-        """
-        # validate url or id, create attributes
-        self.id = e_id
-        self.url = features.create_url(self.id)
-        self.title = title
-        self.last_news_date, self.last_news_title = last_news_date, last_news_title
-        self.calendar = calendar
-        self.next_round_title, self.next_round_date = next_round_title, next_round_date
-        self.status = status
-        self.last_update = datetime.datetime.fromisoformat(last_update)
-        # todo kill me please
-        # if any((title, last_news_date, last_news_title, calendar, next_round_title, next_round_date, status)):
-        # set attributes based on the received values
-        # self.title = title
-        # self.last_news_date, self.last_news_title = last_news_date, last_news_title
-        # self.calendar = calendar
-        # self.next_round_title, self.next_round_date = next_round_title, next_round_date
-        # self.status = status
-        # else:
-        #     print('fuck')
-        #     # set the attributes based on received data from the parser
-        #     self.title = get_title(self.url)
-        #     self.last_news_date, self.last_news_title = get_last_news(self.url)
-        #     self.calendar = get_calendar(self.url)
-        #     self.next_round_title, self.next_round_date = features.last_event_info(self.calendar)
-        #     self.status = get_status(self.url)
-#               self.last_update = datetime now
+    :param url: url or id of the page
+    :return: Event class with parsed information
+    """
+    url, event_id = features.validate_url(url)
+    event = Event(event_id)
+    if not event_id:
+        return event
+
+    event.title = get_title(url)
+    event.last_news_date, event.last_news_title = get_last_news(url)
+    event.calendar = get_calendar(url)
+    event.next_round_title, event.next_round_date = features.last_event_info(event.calendar)
+    event.status = get_status(url)
+    event.last_update = datetime.datetime.now()
+
+    return event
