@@ -33,6 +33,11 @@ class DB:
         self.cursor.execute("SELECT ids FROM users WHERE user = :id", {'id': user_id})
         return self.cursor.fetchone()
 
+    def select_from_events(self, event_id: int, cols: list[str]):
+        # don't use placeholders in this request, '*' won't work!
+        self.cursor.execute(f"SELECT {', '.join(cols)} FROM events WHERE id = {int(event_id)}")
+        return self.cursor.fetchone()
+
     def insert_into_users(self, user_id: int, events: set) -> None:
         """
         Insert into the 'users' table set of event ids
@@ -42,6 +47,13 @@ class DB:
         :return: None
         """
         self.cursor.execute("INSERT OR IGNORE INTO users(user, ids) VALUES(?, ?)", (user_id, str(events)))
+        self.db.commit()
+
+    def insert_into_events(self, data: scrapper.Event) -> None:
+        tmp = (data.id, data.title, data.last_news_date, data.last_news_title, str(data.calendar),
+               data.next_round_title, data.next_round_date, data.status, str(data.last_update))
+        self.cursor.execute("INSERT OR IGNORE INTO events(id, title, news_date, news_title, calendar, next_round, "
+                            "next_date, event_status, last_update) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", tmp)
         self.db.commit()
 
     def update_users(self, user_id: int, events: set) -> None:
@@ -54,11 +66,6 @@ class DB:
         """
         self.cursor.execute("UPDATE users SET ids = :ids WHERE user = :id", {'ids': str(events), 'id': user_id})
         self.db.commit()
-
-    def select_from_events(self, event_id: int, cols: list[str]):
-        # don't use placeholders in this request, '*' won't work!
-        self.cursor.execute(f"SELECT {', '.join(cols)} FROM events WHERE id = {int(event_id)}")
-        return self.cursor.fetchone()
 
 
 db = DB()
@@ -124,16 +131,18 @@ def update_event(event_id: int) -> None:
     :return: None
     """
 
-    event = scrapper.Event(*db.select_from_events(event_id, ['*']))
+    event_request = db.select_from_events(event_id, ['*'])
+    event = None if not event_request else scrapper.Event(*event_request)
 
     # abort the function if not enough time has passed
     delta_time = None if not event else (datetime.datetime.now() - event.last_update)
     if delta_time and delta_time.seconds <= 19800 and delta_time.days < 1:
         return
 
+    parsed_data = scrapper.get_event(str(event_id))
     if not event:
-        # парсим страницу, инсертим в бд строку
-        pass
+        db.insert_into_events(parsed_data)
+        return
     else:
         # сравниваем текущую дату новости из бд и календарь с распаршенными, если поменялись - апдейтим ивент
         pass
