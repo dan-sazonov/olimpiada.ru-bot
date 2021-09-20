@@ -23,6 +23,16 @@ def test_parsing(url: str) -> bool:
     return bool(soup.select('.headline_activity h1'))
 
 
+def create_url(event_id: int) -> str:
+    """
+    Return the correct link to the event by its id
+
+    :param event_id: id of the event
+    :return: link to the event
+    """
+    return f'https://olimpiada.ru/activity/{event_id}'
+
+
 def validate_url(url: str) -> tuple[str, int]:
     """
     Return correct url and id if getting only id. If url is invalid, returns empty string. Otherwise, returns url
@@ -31,8 +41,7 @@ def validate_url(url: str) -> tuple[str, int]:
     :return: (correct url or empty string, id of this event or empty string)
     """
     if url.isdigit():
-        event_id = url
-        url = f'https://olimpiada.ru/activity/{event_id}'
+        url = create_url(int(url))
     if not (url.startswith('https://olimpiada.ru/activity/') and test_parsing(url)):
         return '', 0
     event_id = url.strip('/').split('/')[-1]
