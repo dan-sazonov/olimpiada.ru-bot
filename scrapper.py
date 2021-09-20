@@ -20,8 +20,9 @@ class Event(object):
         self.url = features.create_url(self.id)
         self.title = title
         self.last_news_date, self.last_news_title = last_news_date, last_news_title
-        self.calendar = calendar
-        self.next_round_title, self.next_round_date = next_round_title, next_round_date
+        self.calendar = list(calendar)
+        self.next_round_title = next_round_title
+        self.next_round_date = '' if not next_round_date else datetime.date.fromisoformat(next_round_date)
         self.status = status
         self.last_update = datetime.datetime.fromisoformat(str(last_update))
 
