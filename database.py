@@ -155,7 +155,7 @@ def update_event(event_id: int) -> None:
 
     # abort the function if not enough time has passed
     delta_time = None if not event else (datetime.datetime.now() - event.last_update)
-    if delta_time and delta_time.seconds <= 19800 and delta_time.days < 1:
+    if delta_time and (delta_time.seconds <= 19800 or delta_time.days < 1):
         return
 
     parsed_data = scrapper.get_event(str(event_id))
