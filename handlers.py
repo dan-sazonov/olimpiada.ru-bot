@@ -49,9 +49,15 @@ class MessagesText:
             ans.append(f'{event[0]}: {event[1]} - {event[2]}')
         return '\n'.join(ans)
 
+    def last_news(self):
+        ans = ['Последние новости:']
+        for event in self.user_events.get_last_news():
+            ans.append(f'{event[0]}\n{event[1]}: {event[2]}\n')
+        return '\n'.join(ans)
+
 
 messages = MessagesText(user_id=1)
-print(messages.next_rounds())
+print(messages.last_news())
 
 
 async def start_message(_):
