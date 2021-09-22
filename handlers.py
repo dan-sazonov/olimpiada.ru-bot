@@ -73,12 +73,17 @@ class MessagesText:
 messages = MessagesText()
 
 
-async def start_message():
-    await bot.send_message(chat_id=config.ADMIN_ID, text=messages.start_polling)
+async def start_message(_):
+    await bot.send_message(chat_id=config.ADMIN_CHAT, text=messages.start_polling)
 
 
-async def stop_message():
-    await bot.send_message(chat_id=config.ADMIN_ID, text=messages.stop_polling)
+async def stop_message(_):
+    await bot.send_message(chat_id=config.ADMIN_CHAT, text=messages.stop_polling)
+
+
+@dp.message_handler(commands='statuses')
+async def statuses_messages(message: types.Message):
+    await message.answer(messages.statuses(message.from_user.id))
 
 
 @dp.message_handler(commands=['start', 'help'])
