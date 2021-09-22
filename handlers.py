@@ -15,12 +15,12 @@ class MessagesText:
     Text of messages sending by the bot
     """
 
-    def __init__(self, user_id=0, event_id=0):
+    def __init__(self):
         """
         Create attributes that include the message text
         """
-        self.user_events = database.UserEvents(user_id)
-        self.db_event = database.DbEvent(event_id)
+        self.user_events = database.UserEvents
+        self.db_event = database.DbEvent
 
         self.start_polling = 'Бот запущен'
         self.stop_polling = 'Бот остановлен'
@@ -34,33 +34,38 @@ class MessagesText:
         self.del_events_failed = 'С удалением некотрых ивентов возникли ошибки. Посмотрите все свои олимпухи, чтобы' \
                                  ' понять, что к чему'
 
-    def statuses(self):
+    def statuses(self, user_id: int):
+        user_events = self.user_events(user_id)
         ans = ['Статусы олимпух:']
-        for event in self.user_events.get_statuses():
+        for event in user_events.get_statuses():
             ans.append(f'{event[0]} - {event[1].lower()}.')
         return '\n'.join(ans)
 
-    def next_rounds(self):
+    def next_rounds(self, user_id: int):
+        user_events = self.user_events(user_id)
         ans = ['Предстоящие мероприятия:']
-        for event in self.user_events.get_next_rounds():
+        for event in user_events.get_next_rounds():
             ans.append(f'{event[0]}: {event[1]} - {event[2]}')
         return '\n'.join(ans)
 
-    def last_news(self):
+    def last_news(self, user_id: int):
+        user_events = self.user_events(user_id)
         ans = ['Последние новости:']
-        for event in self.user_events.get_last_news():
+        for event in user_events.get_last_news():
             ans.append(f'{event[0]}\n{event[1]}: {event[2]}\n')
         return '\n'.join(ans)
 
-    def all_events(self):
+    def all_events(self, user_id: int):
+        user_events = self.user_events(user_id)
         ans = ['ID олимпиады, ее название и время последенего обновления:']
-        for event in self.user_events.get_users_events():
+        for event in user_events.get_users_events():
             ans.append(f'{event[0]}: "{event[1]}", {event[2]}')
         return '\n'.join(ans)
 
-    def calendar(self):
+    def calendar(self, event_id: int):
+        db_event = self.db_event(event_id)
         ans = ['Расписание данной олимпиады:']
-        for round_ in self.db_event.get_calendar():
+        for round_ in db_event.get_calendar():
             ans.append(f'{round_[0][0]}: {round_[1]}')
         return '\n'.join(ans)
 
