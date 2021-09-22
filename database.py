@@ -255,7 +255,8 @@ class DbEvent:
 
         :return:
         """
-        return ast.literal_eval(db.select_from_events(self.event_id, ['calendar'])[0])
+        tmp = db.select_from_events(self.event_id, ['calendar'])
+        return [] if not tmp else ast.literal_eval(tmp[0])
 
 
 if __name__ == "__main__":
