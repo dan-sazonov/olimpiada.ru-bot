@@ -170,15 +170,16 @@ def update_event(event_id: int) -> None:
         db.update_events(event_id, data_set)
 
 
-class DbEvents:
+class UserEvents:
     """
-    Functions that get information about events from the database
+    Functions that get information about events from the database by the user's id
     """
 
     def __init__(self, uid: int):
         """
-        Configure class ad self attributes
-        :param uid: id of the user or the event
+        Configure class and self attributes
+
+        :param uid: id of the user
         """
         self.events = get_events(uid)
 
@@ -233,6 +234,28 @@ class DbEvents:
             out.append((event, tmp[0], tmp[1].split()[1].split('.')[0]))
 
         return out
+
+
+class DbEvent:
+    """
+    Functions that get information about events from the database by the event's id
+    """
+
+    def __init__(self, event_id: int):
+        """
+        Configure class and self attributes
+
+        :param event_id: id of the event
+        """
+        self.event_id = event_id
+
+    def get_calendar(self) -> list[tuple[list[str], str]]:
+        """
+        Return calendar of the selected event
+
+        :return:
+        """
+        return ast.literal_eval(db.select_from_events(self.event_id, ['calendar'])[0])
 
 
 if __name__ == "__main__":
