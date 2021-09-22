@@ -180,57 +180,34 @@ class DbEvents:
         Configure class ad self attributes
         :param uid: id of the user or the event
         """
-        self.uid = uid
+        self.events = get_events(uid)
 
-    def get_statuses(self):
+    def get_statuses(self) -> list[tuple[str, str]]:
         """
         Return the statuses of all user events
 
         :return: list with pairs 'title', 'status' in the tuples
         """
-        return [db.select_from_events(e, ['title', 'event_status']) for e in get_events(self.uid)]
+        return [db.select_from_events(e, ['title', 'event_status']) for e in self.events]
+
+    def get_next_rounds(self) -> list[tuple[str, str, str]]:
+        """
+        Return the information about next rounds of all user events
+
+        :return: list with tuples ('title', 'round-title', 'date')
+        """
+        out = []
+        for event in self.events:
+            tmp = db.select_from_events(event, ['title', 'next_round', 'next_date'])
+            if tmp[1] and tmp[2]:
+                out.append((tmp[0], tmp[1], '.'.join(tmp[2].split('-')[::-1])))
+
+        return out
 
 
 # fuck = DbEvents(1)
-# print(fuck.get_statuses())
+# print(fuck.get_next_rounds())
 
-# # fuck the DRY, I want it like this
-# def get_statuses(user_id: int) -> list[tuple[str, str]]:
-#     """
-#     Return the statuses of all user events
-#
-#     :param user_id: user's telegram id
-#     :return: list with pairs 'title', 'status' in the tuples
-#     """
-#     db, cursor = init_bd()
-#     statuses = []
-#
-#     for event in get_events(user_id):
-#         cursor.execute("SELECT title, event_status FROM events WHERE id = :id", {'id': event})
-#         statuses.append(cursor.fetchone())
-#
-#     return statuses
-#
-#
-# def get_next_rounds(user_id: int) -> list[tuple[str, str, str]]:
-#     """
-#     Return the information about next rounds of all user events
-#
-#     :param user_id: user's telegram id
-#     :return: list with tuples ('title', 'round-title', 'date')
-#     """
-#     db, cursor = init_bd()
-#     rounds = []
-#
-#     for event in get_events(user_id):
-#         cursor.execute("SELECT title, next_round, next_date FROM events WHERE id = :id", {'id': event})
-#         tmp = cursor.fetchone()
-#         if tmp[1] and tmp[2]:
-#             rounds.append((tmp[0], tmp[1], '.'.join(tmp[2].split('-')[::-1])))
-#
-#     return rounds
-#
-#
 # def get_last_news(user_id: int) -> list[tuple[str, str, str]]:
 #     """
 #     Return the latest news of all user events
