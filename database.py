@@ -204,15 +204,27 @@ class DbEvents:
 
         return out
 
+    def get_last_news(self) -> list[tuple[str, str, str]]:
+        """
+        Return the latest news of all user events
+
+        :return: list with tuples ('title', 'news date', 'news title')
+        """
+        out = []
+        for event in self.events:
+            tmp = db.select_from_events(event, ['title', 'news_date', 'news_title'])
+            if tmp[1] and tmp[2]:
+                out.append((tmp[0], tmp[1], tmp[2]))
+
+        return out
 
 # fuck = DbEvents(1)
-# print(fuck.get_next_rounds())
+# print(fuck.get_last_news())
 
 # def get_last_news(user_id: int) -> list[tuple[str, str, str]]:
 #     """
 #     Return the latest news of all user events
 #
-#     :param user_id: user's telegram id
 #     :return: list with tuples ('title', 'news date', 'news title')
 #     """
 #     db, cursor = init_bd()
