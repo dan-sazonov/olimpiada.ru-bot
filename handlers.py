@@ -33,8 +33,6 @@ class MessagesText:
         self.del_events_done = 'Удалено!'
         self.del_events_failed = 'С удалением некотрых ивентов возникли ошибки. Посмотрите все свои олимпухи, чтобы' \
                                  ' понять, что к чему'
-        # self.last_news = ''
-        # self.all_events = ''
         # self.calendar = ''
 
     def statuses(self):
@@ -55,9 +53,15 @@ class MessagesText:
             ans.append(f'{event[0]}\n{event[1]}: {event[2]}\n')
         return '\n'.join(ans)
 
+    def all_events(self):
+        ans = ['ID олимпиады, ее название и время последенего обновления:']
+        for event in self.user_events.get_users_events():
+            ans.append(f'{event[0]}: "{event[1]}", {event[2]}')
+        return '\n'.join(ans)
+
 
 messages = MessagesText(user_id=1)
-print(messages.last_news())
+print(messages.all_events())
 
 
 async def start_message(_):
