@@ -45,6 +45,15 @@ class DB:
         self.cursor.execute(f"SELECT {', '.join(cols)} FROM events WHERE id = {int(event_id)}")
         return self.cursor.fetchone()
 
+    def get_users(self) -> list[int]:
+        """
+        Return the set of all users
+
+        :return: set with telegram's ids
+        """
+        self.cursor.execute("SELECT user FROM users")
+        return [i[0] for i in self.cursor.fetchall() if i[0]]
+
     def insert_into_users(self, user_id: int, events: set) -> None:
         """
         Insert into the 'users' table set of event ids
