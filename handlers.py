@@ -33,8 +33,6 @@ class MessagesText:
         self.del_events_done = 'Удалено!'
         self.del_events_failed = 'С удалением некотрых ивентов возникли ошибки. Посмотрите все свои олимпухи, чтобы' \
                                  ' понять, что к чему'
-        # self.statuses = ''
-        # self.next_rounds = ''
         # self.last_news = ''
         # self.all_events = ''
         # self.calendar = ''
@@ -45,9 +43,15 @@ class MessagesText:
             ans.append(f'{event[0]} - {event[1].lower()}.')
         return '\n'.join(ans)
 
+    def next_rounds(self):
+        ans = ['Предстоящие мероприятия:']
+        for event in self.user_events.get_next_rounds():
+            ans.append(f'{event[0]}: {event[1]} - {event[2]}')
+        return '\n'.join(ans)
+
 
 messages = MessagesText(user_id=1)
-print(messages.statuses())
+print(messages.next_rounds())
 
 
 async def start_message(_):
