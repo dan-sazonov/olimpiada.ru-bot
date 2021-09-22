@@ -188,7 +188,7 @@ class DbEvents:
 
         :return: list with pairs 'title', 'status' in the tuples
         """
-        return [db.select_from_events(e, ['title', 'event_status']) for e in self.events]
+        return ['' if not i else i for i in [db.select_from_events(e, ['title', 'event_status']) for e in self.events]]
 
     def get_next_rounds(self) -> list[tuple[str, str, str]]:
         """
@@ -199,6 +199,7 @@ class DbEvents:
         out = []
         for event in self.events:
             tmp = db.select_from_events(event, ['title', 'next_round', 'next_date'])
+            if not tmp: return []
             if tmp[1] and tmp[2]:
                 out.append((tmp[0], tmp[1], '.'.join(tmp[2].split('-')[::-1])))
 
@@ -213,47 +214,25 @@ class DbEvents:
         out = []
         for event in self.events:
             tmp = db.select_from_events(event, ['title', 'news_date', 'news_title'])
+            if not tmp: return []
             if tmp[1] and tmp[2]:
                 out.append((tmp[0], tmp[1], tmp[2]))
 
         return out
 
-# fuck = DbEvents(1)
-# print(fuck.get_last_news())
+    def get_users_events(self) -> list[tuple[str, str, str]]:
+        """
+        Return title, id and time of last updating of all user events
 
-# def get_last_news(user_id: int) -> list[tuple[str, str, str]]:
-#     """
-#     Return the latest news of all user events
-#
-#     :return: list with tuples ('title', 'news date', 'news title')
-#     """
-#     db, cursor = init_bd()
-#     news = []
-#
-#     for event in get_events(user_id):
-#         cursor.execute("SELECT title, news_date, news_title FROM events WHERE id = :id", {'id': event})
-#         tmp = cursor.fetchone()
-#         if tmp[1] and tmp[2]:
-#             news.append((tmp[0], tmp[1], tmp[2]))
-#
-#     return news
-#
-#
-# def get_users_events(user_id: int) -> list[tuple[str, str, str]]:
-#     """
-#     Return title, id and time of last updating of all user events
-#     :param user_id: user's telegram id
-#     :return: list with tuples ('title', 'news date', 'news title')
-#     """
-#     db, cursor = init_bd()
-#     events = []
-#
-#     for event in get_events(user_id):
-#         cursor.execute("SELECT title, last_update FROM events WHERE id = :id", {'id': event})
-#         tmp = cursor.fetchone()
-#         events.append((event, tmp[0], tmp[1].split()[1].split('.')[0]))
-#
-#     return events
+        :return: list with tuples ('title', 'news date', 'news title')
+        """
+        out = []
+        for event in self.events:
+            tmp = db.select_from_events(event, ['title', 'last_update'])
+            if not tmp: return []
+            out.append((event, tmp[0], tmp[1].split()[1].split('.')[0]))
+
+        return out
 
 
 if __name__ == "__main__":
