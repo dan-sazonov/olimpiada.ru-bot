@@ -235,8 +235,6 @@ class UserEvents:
 
         return out
 
-fuck = UserEvents(1)
-print(fuck.get_next_rounds())
 
 class DbEvent:
     """
