@@ -170,6 +170,30 @@ def update_event(event_id: int) -> None:
         db.update_events(event_id, data_set)
 
 
+class DbEvents:
+    """
+    Functions that get information about events from the database
+    """
+
+    def __init__(self, uid: int):
+        """
+        Configure class ad self attributes
+        :param uid: id of the user or the event
+        """
+        self.uid = uid
+
+    def get_statuses(self):
+        """
+        Return the statuses of all user events
+
+        :return: list with pairs 'title', 'status' in the tuples
+        """
+        return [db.select_from_events(e, ['title', 'event_status']) for e in get_events(self.uid)]
+
+
+# fuck = DbEvents(1)
+# print(fuck.get_statuses())
+
 # # fuck the DRY, I want it like this
 # def get_statuses(user_id: int) -> list[tuple[str, str]]:
 #     """

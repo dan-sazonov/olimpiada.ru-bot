@@ -8,7 +8,7 @@ import datetime
 get_element = features.get_element  # parser
 
 
-class Event(object):
+class Event:
     def __init__(self, e_id: int, title='', last_news_date='', last_news_title='', calendar='', next_round_title='',
                  next_round_date='', status='', last_update=datetime.datetime.now()):
         """
