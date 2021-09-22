@@ -86,7 +86,26 @@ async def statuses_messages(message: types.Message):
     await message.answer(messages.statuses(message.from_user.id))
 
 
+@dp.message_handler(commands='next')
+async def statuses_messages(message: types.Message):
+    await message.answer(messages.next_rounds(message.from_user.id))
+
+
+@dp.message_handler(commands='news')
+async def statuses_messages(message: types.Message):
+    await message.answer(messages.last_news(message.from_user.id))
+
+
+@dp.message_handler(commands='my_events')
+async def statuses_messages(message: types.Message):
+    await message.answer(messages.all_events(message.from_user.id))
+
+
+@dp.message_handler(commands='schedule')
+async def statuses_messages(message: types.Message):
+    await message.answer(messages.calendar(465))
+
+
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     await message.reply(messages.help)
-
