@@ -101,7 +101,10 @@ def last_event_info(calendar: list) -> tuple[str, datetime.date]:
     :return: (title, date). If there are no upcoming events, return a tuple with two empty strings
     """
     for event in calendar:
-        time, already_been = convert_date(f"{event[1].split('...')[0]} {event[1].split()[-1]}", is_upcoming=True)
+        day, month = (event[1].split()[1], event[1].split()[1]) if event[1].startswith('До') else (
+            event[1].split('...')[0], event[1].split()[-1])
+
+        time, already_been = convert_date(f"{day} {month}", is_upcoming=True)
         if not already_been:
             return ' '.join(event[0]), time
     return '', ''
