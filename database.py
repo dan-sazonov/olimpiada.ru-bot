@@ -149,7 +149,7 @@ def remove_events(user_id: int, events: set) -> None:
     db.update_users(user_id, tmp)
 
 
-def update_event(event_id: int) -> None:
+def update_event(event_id: int) -> tuple[bool, bool]:
     """
     Add information about event to the database, or update it, if the calendar or the last news title will be changed.
     If less than 5 and a half hours have passed since the last update, the function will be aborted. If event's id is
@@ -164,19 +164,28 @@ def update_event(event_id: int) -> None:
 
     # abort the function if not enough time has passed
     delta_time = None if not event else (datetime.datetime.now() - event.last_update)
-    if delta_time and (delta_time.seconds <= 19800 or delta_time.days < 1):
-        return
+    print(delta_time.seconds, delta_time.days)
+    if delta_time and ((delta_time.days * 86400 + delta_time.seconds) <= 19800):
+        return False, False
 
     parsed_data = scrapper.get_event(str(event_id))
     if not event:
         db.insert_into_events(parsed_data)
-        return
-    if event.last_news_date != parsed_data.last_news_date or event.calendar != parsed_data.calendar:
+        return False, False
+
+    was_updated = {'news': event.last_news_date != parsed_data.last_news_date,
+                   'calendar': event.calendar != parsed_data.calendar, 'status': event.status != parsed_data.status}
+    if was_updated['news'] or was_updated['calendar'] or was_updated['status']:
         pd = parsed_data
         data_set = {'news_date': pd.last_news_date, 'news_title': pd.last_news_title, 'calendar': str(pd.calendar),
                     'next_round': pd.next_round_title, 'next_date': pd.next_round_date, 'event_status': pd.status,
                     'last_update': datetime.datetime.now()}
         db.update_events(event_id, data_set)
+
+    return was_updated['news'], was_updated['status']
+
+
+print(update_event(73))
 
 
 class UserEvents:

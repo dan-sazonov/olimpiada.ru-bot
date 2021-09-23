@@ -81,6 +81,12 @@ async def stop_message(_):
     await bot.send_message(chat_id=config.ADMIN_CHAT, text=messages.stop_polling)
 
 
+async def test_message(_=None):
+    print('fuck')
+    for uid in database.db.get_users():
+        await bot.send_message(chat_id=uid, text='test fucking bitch')
+
+
 @dp.message_handler(commands='statuses')
 async def statuses_messages(message: types.Message):
     await message.answer(messages.statuses(message.from_user.id))
